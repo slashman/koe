@@ -1,0 +1,41 @@
+<html>
+<head>
+<script src ="koe.js"></script>
+<script src = "lib/socket.io.js"></script>
+<style type="text/css">
+	td {
+		width: 30px;
+		height: 30px;
+	}
+</style>
+<body>
+<script>
+	var color = 'black';
+  var socket = io('192.168.60.195:3001');
+  socket.emit('getMap');
+  socket.on('heresTheMap', function (response){
+  	var map = response.map;
+  	color = response.color;
+  	var html = '<table>';
+  	for (var y = 0; y < map[0].length; y++){
+  		html += '<tr>';
+  		for (var x = 0; x < map.length; x++){
+  			if (map[x][y])
+  				html += '<td id = "cell'+x+'-'+y+'" style = "background-color: '+map[x][y]+'" onclick = "conquer('+x+', '+y+')"></td>'
+  			else
+  				html += '<td id = "cell'+x+'-'+y+'" style = "background-color: green" onclick = "conquer('+x+', '+y+')"></td>'
+  		}
+  		html += '</tr>';
+  	}
+  	html += '</table>';
+  	document.getElementById('playArea').innerHTML = html;
+  });
+
+  socket.on('conquered', function(conquerInfo){
+	document.getElementById('cell'+conquerInfo.x+"-"+conquerInfo.y).style.backgroundColor = conquerInfo.color;
+});
+</script>
+<p>Click a region in the map to conquer it.</p>
+<div id = 'playArea'></div>
+</body>
+</html>
