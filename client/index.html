@@ -9,9 +9,11 @@
 	}
 </style>
 <body>
+
 <script>
-	var color = 'black';
-  var socket = io('192.168.60.195:3001');
+  var waiting = false;
+  var color = 'black';
+  var socket = io('http://games.slashware.net:3002');
   socket.emit('getMap');
   socket.on('heresTheMap', function (response){
   	var map = response.map;
@@ -35,7 +37,10 @@
 	document.getElementById('cell'+conquerInfo.x+"-"+conquerInfo.y).style.backgroundColor = conquerInfo.color;
 });
 </script>
+
 <p>Click a region in the map to conquer it.</p>
+<div id = "status" style = "color: green">Ready</div>
 <div id = 'playArea'></div>
+
 </body>
 </html>

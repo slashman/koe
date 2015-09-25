@@ -5,6 +5,7 @@ var io = require('socket.io')(server);
 var model = require('./model');
 
 var colors = {};
+var lastActions = {};
 
 io.on('connection', function(socket){
 	console.log('Someone connected to us');
@@ -28,6 +29,12 @@ io.on('connection', function(socket){
 
 	socket.on('conquer', function(where){
 		console.log('socket '+socket.id+" wants to conquer x:"+where.x+" y:"+where.y);
+		var lastPlayerAction = lastActions[socket.id];
+		if (lastPlayerAction && new Date().getTime() - lastPlayerAction < 1000){
+			return;
+		}
+		lastActions[socket.id] = new Date().getTime();
+
 		socket.broadcast.emit('conquered', {
 			id: socket.id,
 			x: where.x,
