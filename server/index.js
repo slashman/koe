@@ -32,25 +32,47 @@ io.on('connection', function(socket){
 		var lastPlayerAction = lastActions[socket.id];
 		if (lastPlayerAction && new Date().getTime() - lastPlayerAction < 1000){
 			return;
+		}		
+		if(canConquer(lastPlayerAction, model.map, where, colors[socket.id])){
+			socket.broadcast.emit('conquered', {
+				id: socket.id,
+				x: where.x,
+				y: where.y,
+				color: colors[socket.id]
+			});
+			socket.emit('conquered', {
+				id: socket.id,
+				x: where.x,
+				y: where.y,
+				color: colors[socket.id]
+			});
+			model.map[where.x][where.y] = colors[socket.id];			
 		}
 		lastActions[socket.id] = new Date().getTime();
 
-		socket.broadcast.emit('conquered', {
-			id: socket.id,
-			x: where.x,
-			y: where.y,
-			color: colors[socket.id]
-		});
-		socket.emit('conquered', {
-			id: socket.id,
-			x: where.x,
-			y: where.y,
-			color: colors[socket.id]
-		});
-		model.map[where.x][where.y] = colors[socket.id];
 	});
 
 });
+
+var canConquer = function (lastAction, map, where, color){
+	if(!lastAction){
+		return true;
+	}
+	if(where.y > 0 && map[where.x][where.y - 1] === color) { //same color up
+		console.log('same color up');
+		return true;
+	} else if (where.y < model.height-1 && map[where.x][where.y + 1] === color){ //same color down
+		console.log('same color down');
+		return true;
+	} else if (where.x > 0 && map[where.x - 1][where.y] === color ){ //same color left
+		console.log('same color left');
+		return true;
+	} else if (where.x < model.width - 1 && map[where.x + 1][where.y] === color ){ //same color right
+		console.log('same color right');
+		return true;
+	} 
+	return false;
+};
 
 server.listen(3001, function(){
   console.log('listening on *:3001	');
