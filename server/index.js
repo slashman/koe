@@ -34,13 +34,7 @@ io.on('connection', function(socket){
 			return;
 		}		
 		if(canConquer(lastPlayerAction, model.map, where, colors[socket.id])){
-			socket.broadcast.emit('conquered', {
-				id: socket.id,
-				x: where.x,
-				y: where.y,
-				color: colors[socket.id]
-			});
-			socket.emit('conquered', {
+			io.emit('conquered', {
 				id: socket.id,
 				x: where.x,
 				y: where.y,
