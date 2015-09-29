@@ -33,7 +33,6 @@ io.on('connection', function(socket){
 		if (lastPlayerAction && new Date().getTime() - lastPlayerAction < 1000){
 			return;
 		}		
-		console.log('can conquer', canConquer(lastPlayerAction, model.map, where, colors[socket.id]));
 		if(canConquer(lastPlayerAction, model.map, where, colors[socket.id])){
 			socket.broadcast.emit('conquered', {
 				id: socket.id,
