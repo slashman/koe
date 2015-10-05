@@ -22,10 +22,10 @@
   	for (var y = 0; y < map[0].length; y++){
   		html += '<tr>';
   		for (var x = 0; x < map.length; x++){
-  			if (map[x][y])
-  				html += '<td id = "cell'+x+'-'+y+'" style = "background-color: '+map[x][y]+'" onclick = "conquer('+x+', '+y+')"></td>'
+  			if (map[x][y].owner)
+  				html += '<td id = "cell'+x+'-'+y+'" style = "background-color: '+map[x][y].owner+'" onclick = "conquer('+x+', '+y+')">'+map[x][y].peasants+'</td>'
   			else
-  				html += '<td id = "cell'+x+'-'+y+'" style = "background-color: green" onclick = "conquer('+x+', '+y+')"></td>'
+  				html += '<td id = "cell'+x+'-'+y+'" style = "background-color: green" onclick = "conquer('+x+', '+y+')">'+map[x][y].peasants+'</td>'
   		}
   		html += '</tr>';
   	}
@@ -34,8 +34,8 @@
   });
 
   socket.on('conquered', function(conquerInfo){
-	document.getElementById('cell'+conquerInfo.x+"-"+conquerInfo.y).style.backgroundColor = conquerInfo.color;
-});
+  	document.getElementById('cell'+conquerInfo.x+"-"+conquerInfo.y).style.backgroundColor = conquerInfo.color;
+  });
 </script>
 
 <p>Click any region in the map to conquer it. Then continue conquering adjacent regions.</p>
