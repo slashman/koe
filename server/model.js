@@ -1,7 +1,8 @@
 var model = {
 	width : 20,
 	height : 20,
-	map: []
+	map: [],
+	players: []
 }
 
 for (var x = 0; x < model.width; x++){
@@ -13,7 +14,7 @@ for (var x = 0; x < model.width; x++){
 			//TODO: make this a normal distribution and make the mean 
 			//10 to have outliers that are harder to conquer
 			peasants: Math.floor((Math.random() * 10) + 1),
-			
+
 		};
 	}
 }
