@@ -50,4 +50,9 @@ function start(playerName){
 	socket.on('conquered', function(conquerInfo){
 		document.getElementById('cell'+conquerInfo.x+"-"+conquerInfo.y).style.backgroundColor = conquerInfo.color;
 	});
+
+	socket.on('defeat', function(){
+		document.getElementById("status").innerHTML = "Defeat";
+		document.getElementById("status").style.color = "red";
+	});
 }

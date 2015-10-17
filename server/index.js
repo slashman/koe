@@ -26,21 +26,26 @@ io.on('connection', function(socket){
 			return;
 		}
 
-		console.log('checking if user can conquer...')
+		var combatStack = combat.initCombatStack();
+		var result;
+		for(var i in combatStack){
+			result = combatStack[i](user, model, target);
+			if(result == false) break;
+		}
+		console.log('result was ', result);
 		
-		if(canConquer(lastPlayerAction, model.map, target, user.color)
-			&& (combat.attack(user, model.map[target.x][target.y])).success){ // should receive the amount of brigands from the source
+		if(result){ // should receive the amount of brigands from the source
 			io.emit('conquered', {
 				id: socket.id,
 				x: target.x,
 				y: target.y,
 				color: user.color
 			});
-			console.log('user soldiers ' + user.soldiers);
-			console.log('conquered');
 			model.map[target.x][target.y].owner = user.color;
 			user.lastAction = new Date().getTime();
-		}		
+		} else {
+			io.emit('defeat');
+		}
 
 	});
 
@@ -68,33 +73,10 @@ var loadUser = function (player, socketId){
 				newUser.color = 'red';
 				break;
 		}
-		console.log('chosen color = ', newUser.color);
 		model.players[username] = newUser;
 	}
 	return model.players[username];
 }
-
-var canConquer = function (lastAction, map, where, color){
-	console.log('checking canConquer for color '+color);
-	if(!lastAction){
-		console.log('too many actions per second '+lastAction);
-		return true;
-	}
-	if(where.y > 0 && map[where.x][where.y - 1].owner === color) { //same color up
-		console.log('same color up');
-		return true;
-	} else if (where.y < model.height-1 && map[where.x][where.y + 1].owner === color){ //same color down
-		console.log('same color down');
-		return true;
-	} else if (where.x > 0 && map[where.x - 1][where.y].owner === color ){ //same color left
-		console.log('same color left');
-		return true;
-	} else if (where.x < model.width - 1 && map[where.x + 1][where.y].owner === color ){ //same color right
-		console.log('same color right');
-		return true;
-	} 
-	return false;
-};
 
 server.listen(3001, function(){
   console.log('listening on *:3001	');
