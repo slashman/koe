@@ -38,13 +38,13 @@ var combatChecks = {
 	attackPowerCheck: function(user, model, target){
 		console.log('Checking attack power...');
 		var brigands = user.soldiers; //default amount of attackers - should depend on source of attack
-		
+		var targetFief = model.map[target.x][target.y];
 		var brigandPower = 0;
 		var peasantPower = 0;
 		for (var i = 0; i < brigands; i++) {
 			brigandPower += Math.floor((Math.random() * brigandAtk) + 1);
 		}
-		for (var i = 0; i < target.peasants; i++) {
+		for (var i = 0; i < targetFief.peasants; i++) {
 			peasantPower += Math.floor((Math.random() * peasantAtk) + 1);
 		}
 		console.log('brigandPower: ' + brigandPower + ', peasantPower:' + peasantPower );
