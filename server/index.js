@@ -10,45 +10,32 @@ var lastActions = {};
 
 io.on('connection', function(socket){
 	console.log('Someone connected to us');
+	
 	socket.on('getMap', function(player){
 		console.log('received a map request from ', player);
 		var color = false;
 		user = loadUser(player, socket.id);
 		socket.emit('heresTheMap', {map: model.map, color: user.color, soldiers: user.soldiers });
 	});
-
+	
 	socket.on('conquer', function(source, target){
 		console.log('socket '+socket.id+" wants to conquer x:"+target.x+" y:"+target.y + ' from source region: ' + source.x + ","+source.y); 
-
-		//Check for automated conquer attempts
-		var lastPlayerAction = user.lastAction;
-		if (lastPlayerAction && new Date().getTime() - lastPlayerAction < 1000){
-			return;
+		var attack = {
+			user: user,
+			model: model,
+			target: target
 		}
-
-		var combatStack = combat.initCombatStack();
-		var result;
-		for(var i in combatStack){
-			result = combatStack[i](user, model, target);
-			if(result == false) break;
-		}
-		console.log('result was ', result);
-		
-		if(result){ // should receive the amount of brigands from the source
+		if(combat.executeCombatStack(attack)){
 			io.emit('conquered', {
 				id: socket.id,
-				x: target.x,
-				y: target.y,
-				color: user.color
+				attack: attack
 			});
 			model.map[target.x][target.y].owner = user.color;
 			user.lastAction = new Date().getTime();
 		} else {
-			io.emit('defeat');
+			io.emit('defeat', attack);
 		}
-
 	});
-
 });
 
 var loadUser = function (player, socketId){

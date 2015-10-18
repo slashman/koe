@@ -1,29 +1,38 @@
 var brigandAtk = 10; 
 var peasantAtk = 7;
 
-var CombatStack = [];
-
-exports.initCombatStack = function (){
-	
+/*
+	The combat stack will return true if all the checks in the combatChecks object return true.
+*/
+exports.executeCombatStack = function (attack){
 	for(var propt in combatChecks){
-	    CombatStack.push(combatChecks[propt])
-	}
-	return CombatStack;
+	    var result = combatChecks[propt](attack);
+	    if(result == false) break;
+	}	
+	return result;
 }
 
+/*
+	Add combat checks as required while respecting the established order. 
+	Modification of user, model or target objects will affect subsequent checks.
+*/
 var combatChecks = {
-	lastActionCheck: function(user, model, target){
+	lastActionCheck: function(attack){
 		console.log('Checking amount of actions per second...');
-		if (user.lastAction && new Date().getTime() - user.lastAction < 1000){
+		if (attack.user.lastAction && new Date().getTime() - attack.user.lastAction < 1000){
 		  	return false;
 		}
 		return true;
 	},
-	adjacentFiefsCheck: function (user, model, target){
+	adjacentFiefsCheck: function (attack){
 		console.log('Checking adjacent fiefs...');
+		var target = attack.target;
+		var user = attack.user;
+		var model = attack.model;
+
 		if(!user.lastAction){
 			return true;
-		}
+		}		
 		if(target.y > 0 && model.map[target.x][target.y - 1].owner === user.color) { //same color up
 			return true;
 		} else if (target.y < model.height-1 && model.map[target.x][target.y + 1].owner === user.color){ //same color down
@@ -35,8 +44,12 @@ var combatChecks = {
 		} 
 		return false;
 	},
-	attackPowerCheck: function(user, model, target){
+	attackPowerCheck: function(attack){
 		console.log('Checking attack power...');
+		var target = attack.target;
+		var user = attack.user;
+		var model = attack.model;
+
 		var brigands = user.soldiers; //default amount of attackers - should depend on source of attack
 		var targetFief = model.map[target.x][target.y];
 		var brigandPower = 0;
@@ -51,15 +64,14 @@ var combatChecks = {
 
 		var result = brigandPower > peasantPower ? true : false;
 		
-		soldiersLost = calculateLostUnits(brigandPower, peasantPower);
+		attack.attackersLost = calculateLostUnits(brigandPower, peasantPower);
+		attack.defendersLost = calculateLostUnits(brigandPower, peasantPower);
 		
 		return result;
 	}
 };
 
-
-function calculateLostUnits(attackPwr, defensePwr){
-	
+function calculateLostUnits(atkPwr, defPwr){
 	return 0;
 }
 

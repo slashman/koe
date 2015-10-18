@@ -47,11 +47,12 @@ function start(playerName){
 		document.getElementById('soldiers').innerHTML = player.soldiers;
 	});
 
-	socket.on('conquered', function(conquerInfo){
-		document.getElementById('cell'+conquerInfo.x+"-"+conquerInfo.y).style.backgroundColor = conquerInfo.color;
+	socket.on('conquered', function(combatResult){
+		document.getElementById('cell'+combatResult.target.x+"-"+combatResult.target.y).style.backgroundColor = combatResult.color;
 	});
 
-	socket.on('defeat', function(){
+	socket.on('defeat', function(combatResult){
+		console.log('defeat: ', combatResult);
 		document.getElementById("status").innerHTML = "Defeat";
 		document.getElementById("status").style.color = "red";
 	});
