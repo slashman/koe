@@ -1,8 +1,11 @@
+'use strict';
+
 var model = {
 	width : 20,
 	height : 20,
 	map: [],
-	players: []
+	players: [],
+	sockets: []
 }
 
 for (var x = 0; x < model.width; x++){
@@ -19,5 +22,38 @@ for (var x = 0; x < model.width; x++){
 	}
 }
 
-
 module.exports = model;
+
+
+// /**
+//  * Module dependencies.
+//  */
+// var mongoose = require('mongoose'),
+// 	Schema = mongoose.Schema;
+// /**
+//  * Exam Schema
+//  */
+// var ExamSchema = new Schema({
+// 	name: {
+// 		type: String,
+// 		default: '',
+// 		required: 'Please fill Exam name',
+// 		trim: true
+// 	},
+// 	created: {
+// 		type: Date,
+// 		default: Date.now
+// 	},
+// 	user: {
+// 		type: Schema.ObjectId,
+// 		ref: 'User'
+// 	},
+// 	questions: [
+// 		{
+// 			type: Schema.Types.ObjectId, 
+// 			ref: 'Question'
+// 		}
+// 	]
+// });
+
+// mongoose.model('Exam', ExamSchema);
