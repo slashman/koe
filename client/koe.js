@@ -48,7 +48,7 @@ function start(playerName){
 	});
 
 	socket.on('conquered', function(combatResult){
-		document.getElementById('cell'+combatResult.target.x+"-"+combatResult.target.y).style.backgroundColor = combatResult.color;
+		document.getElementById('cell'+combatResult.attack.target.x+"-"+combatResult.attack.target.y).style.backgroundColor = combatResult.attack.user.color;
 	});
 
 	socket.on('defeat', function(combatResult){

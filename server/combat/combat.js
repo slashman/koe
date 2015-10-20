@@ -29,10 +29,11 @@ var combatChecks = {
 		var target = attack.target;
 		var user = attack.user;
 		var model = attack.model;
-
+		console.log('user color: ', user.color);
+		console.log('lastAction: ', user.lastAction);
 		if(!user.lastAction){
 			return true;
-		}		
+		}
 		if(target.y > 0 && model.map[target.x][target.y - 1].owner === user.color) { //same color up
 			return true;
 		} else if (target.y < model.height-1 && model.map[target.x][target.y + 1].owner === user.color){ //same color down
@@ -46,6 +47,7 @@ var combatChecks = {
 	},
 	attackPowerCheck: function(attack){
 		console.log('Checking attack power...');
+		
 		var target = attack.target;
 		var user = attack.user;
 		var model = attack.model;
@@ -66,7 +68,7 @@ var combatChecks = {
 		
 		attack.attackersLost = calculateLostUnits(brigandPower, peasantPower);
 		attack.defendersLost = calculateLostUnits(brigandPower, peasantPower);
-		
+
 		return result;
 	}
 };
