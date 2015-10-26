@@ -25,7 +25,7 @@ function start(playerName){
 	var player = {
 		username: playerName
 	};
-	socket = io('http://192.168.1.16:3001');
+	socket = io('http://localhost:3001');
 	socket.emit('getMap', player);
 	socket.on('heresTheMap', function (response){
 		var map = response.map;

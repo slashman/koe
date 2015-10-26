@@ -1,3 +1,4 @@
+var model = require('../model');
 var brigandAtk = 10; 
 var peasantAtk = 7;
 
@@ -5,11 +6,19 @@ var peasantAtk = 7;
 	The combat stack will return true if all the checks in the combatChecks object return true.
 */
 exports.executeCombatStack = function (attack){
+	//Execute the dynamic combat check stack
 	for(var propt in combatChecks){
-	    var result = combatChecks[propt](attack);
-	    if(result == false) break;
-	}	
-	return result;
+	    attack.result = combatChecks[propt](attack);
+	    if(attack.result == false) break;
+	}
+	//Modify the model based on the result of the combatStack
+	console.log(model.sockets[attack.user.lastActiveSocket]);
+	if(attack.result){
+		model.map[attack.target.x][attack.target.y].owner = model.sockets[attack.user.lastActiveSocket].color;
+		model.sockets[attack.user.lastActiveSocket].lastAction = new Date().getTime();	
+	}
+
+	return attack.result;
 }
 
 /*
@@ -19,6 +28,7 @@ exports.executeCombatStack = function (attack){
 var combatChecks = {
 	lastActionCheck: function(attack){
 		console.log('Checking amount of actions per second...');
+		console.log('time since last action: ', new Date().getTime() - attack.user.lastAction);
 		if (attack.user.lastAction && new Date().getTime() - attack.user.lastAction < 1000){
 		  	return false;
 		}
@@ -71,6 +81,7 @@ var combatChecks = {
 
 		return result;
 	}
+
 };
 
 function calculateLostUnits(atkPwr, defPwr){
