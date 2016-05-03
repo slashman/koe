@@ -26,6 +26,9 @@ exports.executeCombatStack = function (attack){
 	Modification of user, model or target objects will affect subsequent checks.
 */
 var combatChecks = {
+	/*
+		A player should not be able to execute actions more often than once per second.
+	*/
 	lastActionCheck: function(attack){
 		console.log('Checking amount of actions per second...');
 		console.log('time since last action: ', new Date().getTime() - attack.user.lastAction);
@@ -34,6 +37,9 @@ var combatChecks = {
 		}
 		return true;
 	},
+	/*
+		A Player should only be able to initiate attack when they control at least one of the adjacent fiefs.
+	*/
 	adjacentFiefsCheck: function (attack){
 		console.log('Checking adjacent fiefs...');
 		var target = attack.target;
@@ -55,6 +61,9 @@ var combatChecks = {
 		} 
 		return false;
 	},
+	/*
+		A Player can only obtain control of a fief when their attack power exceeds that of the defending fief.
+	*/
 	attackPowerCheck: function(attack){
 		console.log('Checking attack power...');
 		
