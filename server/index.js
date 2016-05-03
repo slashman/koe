@@ -26,8 +26,8 @@ io.on('connection', function(socket){
 		if(CombatService.executeCombatStack(attack)){
 			io.emit('conquered', {
 				id: socket.id,
-				attack: attack
-			});			
+				attack: attack,				
+			});
 		} else {
 			socket.emit('defeat', attack);
 		}

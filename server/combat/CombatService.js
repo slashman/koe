@@ -1,4 +1,5 @@
 var model = require('../model');
+var UserService = require('../users/UserService');
 var brigandAtk = 10; 
 var peasantAtk = 7;
 
@@ -85,8 +86,10 @@ var combatChecks = {
 
 		var result = brigandPower > peasantPower ? true : false;
 		
-		attack.attackersLost = calculateLostUnits(brigandPower, peasantPower);
-		attack.defendersLost = calculateLostUnits(brigandPower, peasantPower);
+		attack.attackersLost = calculateLostUnits(brigandPower, peasantPower).attackers;
+		attack.defendersLost = calculateLostUnits(brigandPower, peasantPower).defenders;
+
+		UserService.updateSoldierCount(user.username, attack.user.soldiers - attack.attackersLost);
 
 		return result;
 	}
@@ -94,7 +97,11 @@ var combatChecks = {
 };
 
 function calculateLostUnits(atkPwr, defPwr){
-	return 0;
+	//if the attackers have > 2x(defPwr)
+	return {
+		attackers: 10,
+		defenders: 10
+	};
 }
 
 

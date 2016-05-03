@@ -11,13 +11,19 @@ exports.loadUser = function (player, socketId){
 			lastAction: false,
 			color: getRandomColor(),
 			username: username,
-			soldiers: 10
+			soldiers: 100
 		};
 		model.players[username] = newUser;
 
 	}
 	model.sockets[socketId] = model.players[username]; //register player in sockets map
 	return model.players[username];
+}
+
+exports.updateSoldierCount = function(username, updatedSoldiers) {
+	user = model.players[username];
+	user.soldiers = updatedSoldiers;
+	model.players[username] = user;
 }
 
 function getRandomColor() {

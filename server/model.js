@@ -1,3 +1,4 @@
+
 'use strict';
 var initModel = function(){
 	console.log('Initializing model...')

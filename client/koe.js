@@ -49,6 +49,7 @@ function start(playerName){
 
 	socket.on('conquered', function(combatResult){
 		document.getElementById('cell'+combatResult.attack.target.x+"-"+combatResult.attack.target.y).style.backgroundColor = combatResult.attack.user.color;
+		document.getElementById('soldiers').innerHTML = combatResult.attack.user.soldiers;
 	});
 
 	socket.on('defeat', function(combatResult){
