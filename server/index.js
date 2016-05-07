@@ -26,7 +26,7 @@ io.on('connection', function(socket){
 		if(CombatService.executeCombatStack(attack)){
 			io.emit('conquered', {
 				id: socket.id,
-				attack: attack,				
+				attack: attack,		
 			});
 		} else {
 			socket.emit('defeat', attack);
@@ -34,7 +34,7 @@ io.on('connection', function(socket){
 	});
 
 	socket.on('disconnect', function() {
-      	console.log('Got disconnect!');
+		console.log('Got disconnect!');
 		delete model.sockets[socket.id];
    });
 });

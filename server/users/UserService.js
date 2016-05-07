@@ -1,34 +1,33 @@
 var model = require('../model');
 
-exports.loadUser = function (player, socketId){
+exports.loadUser = function (playerObj, socketId){
 	console.log('[USER LOADING]');
-	var username = player.username;
-	console.log('Getting user information for: ', username);
-	if(!model.players[username]){
+	if(!model.players[playerObj.username]){
 		console.log('User does not exist. Creating user...');
-		newUser = {
-			lastActiveSocket: socketId,
-			lastAction: false,
-			color: getRandomColor(),
-			username: username,
-			soldiers: 100
-		};
-		model.players[username] = newUser;
-
+		this.createUser(playerObj, socketId);
 	}
-	model.sockets[socketId] = model.players[username]; //register player in sockets map
-	return model.players[username];
+	this.registerUserSocket(model.players[playerObj.username], socketId);
+	return model.players[playerObj.username];
+}
+
+exports.createUser = function (playerObj, socketId){
+	var newUser = {
+		lastActiveSocket: socketId,
+		lastAction: false,
+		color: '#'+(Math.random()*0xFFFFFF<<0).toString(16),
+		username: playerObj.username,
+		soldiers: 100
+	};
+	model.players[playerObj.username] = newUser;
+}
+
+exports.registerUserSocket = function(playerObj, socketId) {
+	model.sockets[socketId] = playerObj;
+	model.players[playerObj.username].lastActiveSocket = socketId;
 }
 
 exports.updateSoldierCount = function(username, updatedSoldiers) {
 	user = model.players[username];
 	user.soldiers = updatedSoldiers;
 	model.players[username] = user;
-}
-
-function getRandomColor() {
-  function c() {
-    return Math.floor(Math.random()*256).toString(16)
-  }
-  return "#"+c()+c()+c();
 }

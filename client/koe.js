@@ -15,8 +15,7 @@ function conquer(x,y){
 	}, 1000);
 }
 
-function login(){
-	
+function login(){	
 	start(document.getElementById("player").value);
 }
 
@@ -26,29 +25,22 @@ function start(playerName){
 		username: playerName
 	};
 	socket = io('http://localhost:3001');
+	
 	socket.emit('getMap', player);
+	
 	socket.on('heresTheMap', function (response){
 		var map = response.map;
 		color = response.color;
 		player.soldiers = response.soldiers;
-		var html = '<table>';
-		for (var y = 0; y < map[0].length; y++){
-			html += '<tr>';
-			for (var x = 0; x < map.length; x++){
-				if (map[x][y].owner)
-					html += '<td id = "cell'+x+'-'+y+'" style = "background-color: '+map[x][y].owner+'" onclick = "conquer('+x+', '+y+')">'+map[x][y].peasants+'</td>'
-				else
-					html += '<td id = "cell'+x+'-'+y+'" style = "background-color: green" onclick = "conquer('+x+', '+y+')">'+map[x][y].peasants+'</td>'
-			}
-			html += '</tr>';
-		}
-		html += '</table>';
-		document.getElementById('playArea').innerHTML = html;
+		renderMap(map);
 		document.getElementById('soldiers').innerHTML = player.soldiers;
 	});
 
 	socket.on('conquered', function(combatResult){
-		document.getElementById('cell'+combatResult.attack.target.x+"-"+combatResult.attack.target.y).style.backgroundColor = combatResult.attack.user.color;
+		targetCell = document.getElementById('cell'+combatResult.attack.target.x+"-"+combatResult.attack.target.y);
+		targetCell.style.backgroundColor = combatResult.attack.user.color;
+		debugger;
+		targetCell.innerHTML = 'C';
 		document.getElementById('soldiers').innerHTML = combatResult.attack.user.soldiers;
 	});
 
@@ -57,4 +49,21 @@ function start(playerName){
 		document.getElementById("status").innerHTML = "Defeat";
 		document.getElementById("status").style.color = "red";
 	});
+	
+}
+
+function renderMap(map) {
+	var html = '<table>';
+	for (var y = 0; y < map[0].length; y++){
+		html += '<tr>';
+		for (var x = 0; x < map.length; x++){
+			if (map[x][y].owner)
+				html += '<td id = "cell'+x+'-'+y+'" style = "background-color: '+map[x][y].owner+'" onclick = "conquer('+x+', '+y+')">'+map[x][y].peasants+'</td>'
+			else
+				html += '<td id = "cell'+x+'-'+y+'" style = "background-color: green" onclick = "conquer('+x+', '+y+')">'+map[x][y].peasants+'</td>'
+		}
+		html += '</tr>';
+	}
+	html += '</table>';
+	document.getElementById('playArea').innerHTML = html;
 }

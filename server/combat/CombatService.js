@@ -8,7 +8,7 @@ var peasantAtk = 7;
 */
 exports.executeCombatStack = function (attack){
 	//Execute the dynamic combat check stack
-	for(var propt in combatChecks){
+	for(var propt in combatChecks){	
 	    attack.result = combatChecks[propt](attack);
 	    if(attack.result == false) break;
 	}
@@ -90,6 +90,7 @@ var combatChecks = {
 		attack.defendersLost = calculateLostUnits(brigandPower, peasantPower).defenders;
 
 		UserService.updateSoldierCount(user.username, attack.user.soldiers - attack.attackersLost);
+		targetFief.peasants -= attack.defendersLost;
 
 		return result;
 	}
@@ -99,8 +100,8 @@ var combatChecks = {
 function calculateLostUnits(atkPwr, defPwr){
 	//if the attackers have > 2x(defPwr)
 	return {
-		attackers: 10,
-		defenders: 10
+		attackers: 5,
+		defenders: 1
 	};
 }
 
