@@ -32,7 +32,6 @@ var combatChecks = {
 	*/
 	lastActionCheck: function(attack){
 		console.log('Checking amount of actions per second...');
-		console.log('time since last action: ', new Date().getTime() - attack.user.lastAction);
 		if (attack.user.lastAction && new Date().getTime() - attack.user.lastAction < 1000){
 		  	return false;
 		}
