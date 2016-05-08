@@ -14,9 +14,9 @@ exports.createUser = function (playerObj, socketId){
 	var newUser = {
 		lastActiveSocket: socketId,
 		lastAction: false,
-		color: '#'+(Math.random()*0xFFFFFF<<0).toString(16),
+		color: getRandomColor(),
 		username: playerObj.username,
-		soldiers: 100
+		soldiers: 1000
 	};
 	model.players[playerObj.username] = newUser;
 }
@@ -30,4 +30,12 @@ exports.updateSoldierCount = function(username, updatedSoldiers) {
 	user = model.players[username];
 	user.soldiers = updatedSoldiers;
 	model.players[username] = user;
+}
+
+function getRandomColor(){
+	var color = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+	while (color.length < 7){
+		color += '0';
+	}
+	return color;
 }

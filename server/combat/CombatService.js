@@ -15,9 +15,9 @@ exports.executeCombatStack = function (attack){
 	//Modify the model based on the result of the combatStack
 	console.log(model.sockets[attack.user.lastActiveSocket]);
 	if(attack.result){
-		model.map[attack.target.x][attack.target.y].owner = model.sockets[attack.user.lastActiveSocket].color;
+		model.map[attack.target.x][attack.target.y].owner = model.sockets[attack.user.lastActiveSocket];
 		model.sockets[attack.user.lastActiveSocket].lastAction = new Date().getTime();	
-	}
+	} 
 
 	return attack.result;
 }
@@ -33,8 +33,9 @@ var combatChecks = {
 	lastActionCheck: function(attack){
 		console.log('Checking amount of actions per second...');
 		if (attack.user.lastAction && new Date().getTime() - attack.user.lastAction < 1000){
+			attack.failReason = "You can't attack so fast after your previous attack.";
 		  	return false;
-		}
+		}		
 		return true;
 	},
 	/*
@@ -50,16 +51,18 @@ var combatChecks = {
 		if(!user.lastAction){
 			return true;
 		}
-		if(target.y > 0 && model.map[target.x][target.y - 1].owner === user.color) { //same color up
+		if(target.y > 0 && model.map[target.x][target.y - 1].owner.color === user.color) { //same color up
 			return true;
-		} else if (target.y < model.height-1 && model.map[target.x][target.y + 1].owner === user.color){ //same color down
+		} else if (target.y < model.height-1 && model.map[target.x][target.y + 1].owner.color === user.color){ //same color down
 			return true;
-		} else if (target.x > 0 && model.map[target.x - 1][target.y].owner === user.color ){ //same color left
+		} else if (target.x > 0 && model.map[target.x - 1][target.y].owner.color === user.color ){ //same color left
 			return true;
-		} else if (target.x < model.width - 1 && model.map[target.x + 1][target.y].owner === user.color ){ //same color right
+		} else if (target.x < model.width - 1 && model.map[target.x + 1][target.y].owner.color === user.color ){ //same color right
 			return true;
 		} 
-		return false;
+
+		attack.failReason = "You can only attack adjacent fiefs to your territory.";
+		return false;		
 	},
 	/*
 		A Player can only obtain control of a fief when their attack power exceeds that of the defending fief.
@@ -83,13 +86,24 @@ var combatChecks = {
 		}
 		console.log('brigandPower: ' + brigandPower + ', peasantPower:' + peasantPower );
 
-		var result = brigandPower > peasantPower ? true : false;
+		var result = false;
+
+		if(brigandPower > peasantPower){
+			result = true;
+		} else {
+			attack.failReason = "Your forces were defeated.";
+		}
 		
 		attack.attackersLost = calculateLostUnits(brigandPower, peasantPower).attackers;
 		attack.defendersLost = calculateLostUnits(brigandPower, peasantPower).defenders;
 
-		UserService.updateSoldierCount(user.username, attack.user.soldiers - attack.attackersLost);
-		targetFief.peasants -= attack.defendersLost;
+		var updatedCount = attack.user.soldiers - attack.attackersLost;
+		updatedCount = updatedCount >= 0 ? updatedCount : 0;		
+		UserService.updateSoldierCount(user.username, updatedCount);
+
+		var updatedPeasants = targetFief.peasants - attack.defendersLost;
+		updatedPeasants = updatedPeasants >= 0 ? updatedPeasants : 0;		
+		targetFief.peasants = updatedPeasants;
 
 		return result;
 	}
@@ -97,11 +111,18 @@ var combatChecks = {
 };
 
 function calculateLostUnits(atkPwr, defPwr){
-	//if the attackers have > 2x(defPwr)
-	return {
-		attackers: 5,
-		defenders: 1
+	casualties = {
+		attackers: 0,
+		defenders: 0
 	};
+	if(atkPwr > 0){
+		casualties = {
+			attackers: 5,
+			defenders: 1
+		};
+	}
+
+	return casualties;
 }
 
 

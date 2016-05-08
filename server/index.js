@@ -28,6 +28,7 @@ io.on('connection', function(socket){
 				id: socket.id,
 				attack: attack,		
 			});
+			socket.emit('soldierCount', attack);
 		} else {
 			socket.emit('defeat', attack);
 		}

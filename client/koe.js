@@ -39,14 +39,16 @@ function start(playerName){
 	socket.on('conquered', function(combatResult){
 		targetCell = document.getElementById('cell'+combatResult.attack.target.x+"-"+combatResult.attack.target.y);
 		targetCell.style.backgroundColor = combatResult.attack.user.color;
-		debugger;
-		targetCell.innerHTML = 'C';
-		document.getElementById('soldiers').innerHTML = combatResult.attack.user.soldiers;
+		targetCell.title = combatResult.attack.user.username;		
+	});
+
+	socket.on('soldierCount', function(combatResult){
+		document.getElementById('soldiers').innerHTML = combatResult.user.soldiers;		
 	});
 
 	socket.on('defeat', function(combatResult){
 		console.log('defeat: ', combatResult);
-		document.getElementById("status").innerHTML = "Defeat";
+		document.getElementById("status").innerHTML = combatResult.failReason;
 		document.getElementById("status").style.color = "red";
 	});
 	
@@ -58,9 +60,9 @@ function renderMap(map) {
 		html += '<tr>';
 		for (var x = 0; x < map.length; x++){
 			if (map[x][y].owner)
-				html += '<td id = "cell'+x+'-'+y+'" style = "background-color: '+map[x][y].owner+'" onclick = "conquer('+x+', '+y+')">'+map[x][y].peasants+'</td>'
+				html += '<td id = "cell'+x+'-'+y+'" title='+map[x][y].owner.username+' style = "background-color: '+map[x][y].owner.color+'" onclick = "conquer('+x+', '+y+')">'+map[x][y].peasants+'</td>'
 			else
-				html += '<td id = "cell'+x+'-'+y+'" style = "background-color: green" onclick = "conquer('+x+', '+y+')">'+map[x][y].peasants+'</td>'
+				html += '<td id = "cell'+x+'-'+y+'" title="Unconquered" style = "background-color: green" onclick = "conquer('+x+', '+y+')">'+map[x][y].peasants+'</td>'
 		}
 		html += '</tr>';
 	}
