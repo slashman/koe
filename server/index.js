@@ -3,70 +3,42 @@ var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var model = require('./model');
-
-var colors = {};
-var lastActions = {};
+var CombatService = require('./combat/CombatService');
+var UserService = require('./users/UserService');
 
 io.on('connection', function(socket){
 	console.log('Someone connected to us');
-	switch (Math.floor(Math.random()*3)){
-		case 0:
-		colors[socket.id] = 'yellow';
-		break;
-		case 1:
-
-		colors[socket.id] = 'blue';
-		break;
-		case 2:
-
-		colors[socket.id] = 'red';
-		break;
-	}
-
-	socket.on('getMap', function(){
-		socket.emit('heresTheMap', {map: model.map, color: colors[socket.id]});
+	
+	socket.on('getMap', function(player){
+		console.log('received a map request from ', player);
+		var color = false;
+		var user = UserService.loadUser(player, socket.id);
+		socket.emit('heresTheMap', {map: model.map, color: user.color, soldiers: user.soldiers });
 	});
-
-	socket.on('conquer', function(where){
-		console.log('socket '+socket.id+" wants to conquer x:"+where.x+" y:"+where.y);
-		var lastPlayerAction = lastActions[socket.id];
-		if (lastPlayerAction && new Date().getTime() - lastPlayerAction < 1000){
-			return;
-		}		
-		if(canConquer(lastPlayerAction, model.map, where, colors[socket.id])){
+	
+	socket.on('conquer', function(source, target){
+		console.log('socket '+socket.id+" wants to conquer x:"+target.x+" y:"+target.y + ' from source region: ' + source.x + ","+source.y); 
+		var attack = {
+			user: model.sockets[socket.id],
+			model: model,
+			target: target
+		}
+		if(CombatService.executeCombatStack(attack)){
 			io.emit('conquered', {
 				id: socket.id,
-				x: where.x,
-				y: where.y,
-				color: colors[socket.id]
+				attack: attack,		
 			});
-			model.map[where.x][where.y] = colors[socket.id];			
+			socket.emit('soldierCount', attack);
+		} else {
+			socket.emit('defeat', attack);
 		}
-		lastActions[socket.id] = new Date().getTime();
-
 	});
 
+	socket.on('disconnect', function() {
+		console.log('Got disconnect!');
+		delete model.sockets[socket.id];
+   });
 });
-
-var canConquer = function (lastAction, map, where, color){
-	if(!lastAction){
-		return true;
-	}
-	if(where.y > 0 && map[where.x][where.y - 1] === color) { //same color up
-		console.log('same color up');
-		return true;
-	} else if (where.y < model.height-1 && map[where.x][where.y + 1] === color){ //same color down
-		console.log('same color down');
-		return true;
-	} else if (where.x > 0 && map[where.x - 1][where.y] === color ){ //same color left
-		console.log('same color left');
-		return true;
-	} else if (where.x < model.width - 1 && map[where.x + 1][where.y] === color ){ //same color right
-		console.log('same color right');
-		return true;
-	} 
-	return false;
-};
 
 server.listen(3001, function(){
   console.log('listening on *:3001	');
